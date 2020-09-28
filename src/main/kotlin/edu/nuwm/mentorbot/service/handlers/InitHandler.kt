@@ -23,10 +23,11 @@ class InitHandler(
 
     override fun setInitButtons(sendMessage: SendMessage) {
         val replyKeyboardMarkup = ReplyKeyboardMarkup()
-        sendMessage.replyMarkup = replyKeyboardMarkup
-        replyKeyboardMarkup.selective = true
-        replyKeyboardMarkup.resizeKeyboard = true
-        replyKeyboardMarkup.oneTimeKeyboard = true
+        replyKeyboardMarkup.apply {
+            selective = true
+            resizeKeyboard = true
+            oneTimeKeyboard = true
+        }
 
         // Create keyboard rows
         val keyboard = ArrayList<KeyboardRow>()
@@ -40,5 +41,6 @@ class InitHandler(
         keyboard.add(keyboardRow)
         // Apply keyboard to message
         replyKeyboardMarkup.keyboard = keyboard
+        sendMessage.replyMarkup = replyKeyboardMarkup
     }
 }

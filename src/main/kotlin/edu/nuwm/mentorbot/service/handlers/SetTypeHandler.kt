@@ -12,16 +12,16 @@ class SetTypeHandler(
 ) : Handler {
 
     override fun getMessage(chatId: Long, messageText: String): SendMessage {
-        return when {
-            ("МЕНТОР!" == messageText.toUpperCase()) -> {
+        return when (messageText.toUpperCase()) {
+            "МЕНТОР!" -> {
                 userStatesRepository.save(UserState(chatId, State.MENTOR_DEFAULT))
                 SendMessage(chatId, "Привіт Ментор!")
             }
-            ("СТУДЕНТ!" == messageText.toUpperCase()) -> {
+            "СТУДЕНТ!" -> {
                 userStatesRepository.save(UserState(chatId, State.STUDENT_DEFAULT))
                 SendMessage(chatId, "Привіт Студент!")
             }
-            else -> SendMessage(chatId, "Не зрозумів, давай ще раз").apply { setInitButtons(this) }
+            else -> SendMessage(chatId, "Не зрозумів, давай ще раз")
         }
     }
 }
