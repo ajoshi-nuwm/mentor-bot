@@ -4,3 +4,9 @@ spring:
       user: root
       password: root
       uri: mongodb://root:root@192.168.99.100:27017/mentor_bot?authSource=admin&readPreference=primary&ssl=false
+
+
+telegram:
+  bot:
+    username: NUWEE Mentor Bot
+    token: 1041495813:AAHiOzjRVsvNsD30lB-qI4IPhbysqhbm9Ig

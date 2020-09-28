@@ -1,24 +1,28 @@
 package edu.nuwm.mentorbot.api.bot
 
 import edu.nuwm.mentorbot.service.BotService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.objects.Update
 
 @Component
-class MentorBot(private val botService: BotService) : TelegramLongPollingBot() {
-    override fun getBotUsername(): String {
-        return "NUWEE Mentor Bot"
-    }
+class MentorBot(
+        private val botService: BotService
+) : TelegramLongPollingBot() {
 
-    override fun getBotToken(): String {
-        return "1041495813:AAHiOzjRVsvNsD30lB-qI4IPhbysqhbm9Ig"
-    }
+    @Value("\${telegram.bot.username}")
+    lateinit var username: String
 
-    override fun onUpdateReceived(update: Update?) {
-        val chatId = update?.message?.chatId
-        val messageText = update?.message?.text
+    @Value("\${telegram.bot.token}")
+    lateinit var token: String
 
-        execute(botService.processMessage(chatId, messageText))
+    override fun getBotUsername() = username
+
+    override fun getBotToken() = token
+
+    override fun onUpdateReceived(update: Update) {
+        val message = update.message ?: throw IllegalArgumentException("Chat id is empty")
+        execute(botService.processMessage(message))
     }
 }
