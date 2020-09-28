@@ -17,9 +17,9 @@ class MentorBot(
     @Value("\${telegram.bot.token}")
     lateinit var token: String
 
-    override fun getBotUsername() = username
+    override fun getBotUsername(): String = username
 
-    override fun getBotToken() = token
+    override fun getBotToken(): String = token
 
     override fun onUpdateReceived(update: Update) {
         val message = update.message ?: throw IllegalArgumentException("Chat id is empty")

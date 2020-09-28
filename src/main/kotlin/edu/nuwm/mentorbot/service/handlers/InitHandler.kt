@@ -14,8 +14,8 @@ class InitHandler(
         private val userStatesRepository: UserStatesRepository
 ) : Handler {
 
-    override fun getMessage(chatId: Long?, messageText: String?): SendMessage {
-        chatId?.let { userStatesRepository.save(UserState(it, State.SET_TYPE)) }
+    override fun getMessage(chatId: Long, messageText: String): SendMessage {
+        userStatesRepository.save(UserState(chatId, State.SET_TYPE))
         val response = SendMessage(chatId, "Привіт! Радий бачити тебе тут. Ти ментор чи студент?")
         setInitButtons(response)
         return response
