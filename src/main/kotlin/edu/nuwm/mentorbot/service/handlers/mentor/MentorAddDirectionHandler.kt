@@ -1,12 +1,10 @@
-package edu.nuwm.mentorbot.service.handlers
+package edu.nuwm.mentorbot.service.handlers.mentor
 
 import edu.nuwm.mentorbot.persistence.DirectionsRepository
 import edu.nuwm.mentorbot.persistence.UsersRepository
 import edu.nuwm.mentorbot.persistence.entities.Direction
 import edu.nuwm.mentorbot.persistence.entities.State
 import edu.nuwm.mentorbot.persistence.entities.User
-import edu.nuwm.mentorbot.service.controls.keyboards.ButtonConstants.Companion.BACK
-import edu.nuwm.mentorbot.unwrap
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
@@ -15,26 +13,12 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 class MentorAddDirectionHandler(
         private val usersRepository: UsersRepository,
         private val directionsRepository: DirectionsRepository
-) : MessageHandler {
+) : AbstractMentorHandler(usersRepository) {
 
-    override fun getMessage(user: User, inputMessage: String): SendMessage {
+    override fun getMentorMessage(user: User, inputMessage: String): SendMessage {
 
-        if (inputMessage == BACK) {
-            user.state = State.MENTOR_DEFAULT
-            usersRepository.save(user)
-            return SendMessage(user.chatId, NEXT_TIME)
-        }
-
-        var direction = directionsRepository.findById(inputMessage).unwrap()
-        var newDirection = false
-
-        if (direction == null) {
-            direction = directionsRepository.save(Direction(inputMessage))
-            newDirection = true
-        }
-        direction.mentors[user.userId] = ""
-        directionsRepository.save(direction)
-        return when (newDirection) {
+        val directionExists = createDirection(user, inputMessage)
+        return when (directionExists) {
             true -> {
                 user.state = State.MENTOR_DEFAULT
                 usersRepository.save(user)
@@ -46,6 +30,19 @@ class MentorAddDirectionHandler(
                 SendMessage(user.chatId, EXISTED_DIRECTION)
             }
         }
+    }
+
+    private fun createDirection(user: User, directionName: String): Boolean {
+        var direction = directionsRepository.findByIdOrNull(directionName)
+        var newDirection = false
+
+        if (direction == null) {
+            direction = directionsRepository.save(Direction(directionName))
+            newDirection = true
+        }
+        direction.mentors[user.userId] = ""
+        directionsRepository.save(direction)
+        return newDirection
     }
 
     companion object {

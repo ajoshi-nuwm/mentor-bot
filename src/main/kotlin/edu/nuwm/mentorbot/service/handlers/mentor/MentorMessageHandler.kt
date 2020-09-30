@@ -1,4 +1,4 @@
-package edu.nuwm.mentorbot.service.handlers
+package edu.nuwm.mentorbot.service.handlers.mentor
 
 import edu.nuwm.mentorbot.persistence.DirectionsRepository
 import edu.nuwm.mentorbot.persistence.UsersRepository
@@ -8,7 +8,6 @@ import edu.nuwm.mentorbot.service.controls.keyboards.ButtonConstants.Companion.M
 import edu.nuwm.mentorbot.service.controls.keyboards.ButtonConstants.Companion.MENTOR_GET_MY_DIRECTIONS
 import edu.nuwm.mentorbot.service.controls.keyboards.ButtonConstants.Companion.MENTOR_GET_OTHER_MENTORS
 import edu.nuwm.mentorbot.service.handlers.MessageHandler.Companion.ERROR_GREETING
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import org.telegram.telegrambots.meta.api.methods.ParseMode
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
@@ -17,9 +16,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 class MentorMessageHandler(
         private val usersRepository: UsersRepository,
         private val directionsRepository: DirectionsRepository
-) : MessageHandler {
+) : AbstractMentorHandler(usersRepository) {
 
-    override fun getMessage(user: User, inputMessage: String): SendMessage {
+    override fun getMentorMessage(user: User, inputMessage: String): SendMessage {
         return when (inputMessage) {
             MENTOR_ADD_DIRECTION -> {
                 user.state = State.MENTOR_ADD_DIRECTION

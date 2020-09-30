@@ -1,8 +1,9 @@
-package edu.nuwm.mentorbot.service.handlers
+package edu.nuwm.mentorbot.service.handlers.common
 
 import edu.nuwm.mentorbot.persistence.UsersRepository
 import edu.nuwm.mentorbot.persistence.entities.State
 import edu.nuwm.mentorbot.persistence.entities.User
+import edu.nuwm.mentorbot.service.handlers.MessageHandler
 import org.springframework.stereotype.Component
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 

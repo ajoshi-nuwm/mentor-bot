@@ -4,10 +4,10 @@ import edu.nuwm.mentorbot.persistence.UsersRepository
 import edu.nuwm.mentorbot.persistence.entities.State
 import edu.nuwm.mentorbot.persistence.entities.User
 import edu.nuwm.mentorbot.service.controls.KeyboardProvider
-import edu.nuwm.mentorbot.service.handlers.InitMessageHandler
-import edu.nuwm.mentorbot.service.handlers.MentorAddDirectionHandler
-import edu.nuwm.mentorbot.service.handlers.MentorMessageHandler
-import edu.nuwm.mentorbot.service.handlers.SetTypeMessageHandler
+import edu.nuwm.mentorbot.service.handlers.common.InitMessageHandler
+import edu.nuwm.mentorbot.service.handlers.mentor.MentorAddDirectionHandler
+import edu.nuwm.mentorbot.service.handlers.mentor.MentorMessageHandler
+import edu.nuwm.mentorbot.service.handlers.common.SetTypeMessageHandler
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
@@ -35,9 +35,13 @@ class BotService(
         }
 
         val sendMessage = when (user.state) {
+            // init state -> set type
             State.INIT -> initHandler.getMessage(user)
+            // set type - default state
             State.SET_TYPE -> setTypeHandler.getMessage(user, inputMessage)
+            // mentor options
             State.MENTOR_DEFAULT -> mentorMessageHandler.getMessage(user, inputMessage)
+            // add direction
             State.MENTOR_ADD_DIRECTION -> mentorAddDirectionHandler.getMessage(user, inputMessage)
             else -> SendMessage(chatId, "Спробуй ще раз")
         }
