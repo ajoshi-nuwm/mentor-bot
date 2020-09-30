@@ -1,8 +1,8 @@
 package edu.nuwm.mentorbot.persistence
 
-import edu.nuwm.mentorbot.persistence.entities.UserState
+import edu.nuwm.mentorbot.persistence.entities.User
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface UserStatesRepository : CrudRepository<UserState, Long>
+interface UsersRepository : CrudRepository<User, Int>

@@ -1,31 +1,59 @@
 package edu.nuwm.mentorbot.service
 
-import edu.nuwm.mentorbot.persistence.UserStatesRepository
+import edu.nuwm.mentorbot.persistence.UsersRepository
 import edu.nuwm.mentorbot.persistence.entities.State
-import edu.nuwm.mentorbot.service.handlers.InitHandler
-import edu.nuwm.mentorbot.service.handlers.SetTypeHandler
+import edu.nuwm.mentorbot.persistence.entities.User
+import edu.nuwm.mentorbot.service.controls.KeyboardProvider
+import edu.nuwm.mentorbot.service.handlers.InitMessageHandler
+import edu.nuwm.mentorbot.service.handlers.MentorAddDirectionHandler
+import edu.nuwm.mentorbot.service.handlers.MentorMessageHandler
+import edu.nuwm.mentorbot.service.handlers.SetTypeMessageHandler
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Message
 
 @Service
 class BotService(
-        private val userStatesRepository: UserStatesRepository,
-        private val initHandler: InitHandler,
-        private val setTypeHandler: SetTypeHandler
+        private val usersRepository: UsersRepository,
+        private val initHandler: InitMessageHandler,
+        private val setTypeHandler: SetTypeMessageHandler,
+        private val mentorMessageHandler: MentorMessageHandler,
+        private val mentorAddDirectionHandler: MentorAddDirectionHandler,
+        private val keyboardProvider: KeyboardProvider
 ) {
 
     fun processMessage(message: Message): SendMessage {
         val chatId = message.chatId
-        val messageText = message.text
+        val userId = message.from.id
+        val username = message.from.userName
+        val inputMessage = message.text
 
-        val userState = userStatesRepository.findById(chatId)
-        val state = userState.map { it.state }.orElse(State.INIT)
+        var user = usersRepository.findByIdOrNull(userId)
+        if (user == null) {
+            user = saveUser(User(userId, username, chatId, State.INIT))
+        }
 
-        return when (state) {
-            State.INIT -> initHandler.buildMessage(chatId)
-            State.SET_TYPE -> setTypeHandler.buildMessage(chatId, messageText)
+        val sendMessage = when (user.state) {
+            State.INIT -> initHandler.getMessage(user)
+            State.SET_TYPE -> setTypeHandler.getMessage(user, inputMessage)
+            State.MENTOR_DEFAULT -> mentorMessageHandler.getMessage(user, inputMessage)
+            State.MENTOR_ADD_DIRECTION -> mentorAddDirectionHandler.getMessage(user, inputMessage)
             else -> SendMessage(chatId, "Спробуй ще раз")
         }
+
+        val currentState = getCurrentState(userId)
+        addKeyboard(sendMessage, currentState)
+        return sendMessage
+    }
+
+    private fun saveUser(user: User): User = usersRepository.save(user)
+
+    private fun getCurrentState(userId: Int): State {
+        return usersRepository.findById(userId).map { it.state }.orElse(State.INIT)
+    }
+
+    private fun addKeyboard(sendMessage: SendMessage, state: State) {
+        sendMessage.replyMarkup = keyboardProvider.getKeyboard(state).getKeyboard()
     }
 }

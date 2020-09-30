@@ -22,7 +22,7 @@ class MentorBot(
     override fun getBotToken(): String = token
 
     override fun onUpdateReceived(update: Update) {
-        val message = update.message ?: throw IllegalArgumentException("Chat id is empty")
+        val message = update.message ?: throw IllegalArgumentException("Chat userId is empty")
         execute(botService.processMessage(message))
     }
 }
