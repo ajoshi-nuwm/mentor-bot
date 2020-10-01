@@ -15,12 +15,12 @@ class MentorAddExperienceHandler(
 ) : AbstractMentorHandler(usersRepository) {
 
     override fun getMentorMessage(user: User, inputMessage: String): SendMessage {
-        val directionName = user.context["direction"] ?: throw Exception("Direction not found in a context")
+        val directionName = user.context["editDirection"] ?: throw Exception("Direction not found in a context")
         val direction = directionsRepository.findByIdOrNull(directionName)
                 ?: throw Exception("Direction not found: $directionName")
         direction.mentors[user.userId] = inputMessage
         user.state = State.MENTOR_DEFAULT
-        user.context["directions"] = "${user.context["directions"]}:${direction.name}"
+        user.directions.add(directionName)
 
         directionsRepository.save(direction)
         usersRepository.save(user)

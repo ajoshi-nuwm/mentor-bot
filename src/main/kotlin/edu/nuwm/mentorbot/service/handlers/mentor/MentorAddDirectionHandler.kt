@@ -30,7 +30,7 @@ class MentorAddDirectionHandler(
             }
             false -> {
                 user.state = State.MENTOR_ADD_EXPERIENCE
-                user.context["direction"] = directionCreation.name
+                user.context["editDirection"] = directionCreation.name
                 usersRepository.save(user)
                 SendMessage(user.chatId, EXISTED_DIRECTION)
             }

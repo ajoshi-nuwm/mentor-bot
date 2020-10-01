@@ -42,14 +42,14 @@ class MentorMessageHandler(
     }
 
     private fun getMentorDirections(user: User): String {
-        val userDirections = user.context["directions"]
-        val directionIds = userDirections?.split(":")
-        val found = directionIds?.let {
-            directionsRepository.findAllById(it)
+        val found = directionsRepository.findAllById(user.directions).toList()
+        return if (found.isEmpty()) {
+            "В тебе немає напрямів. Швидше додавай нові!"
+        } else {
+            found.joinToString("\n\n") { direction ->
+                "`${direction.name}:` \n\n${direction.mentors[user.userId]}"
+            }
         }
-        return found?.joinToString("\n\n") { direction ->
-            "`${direction.name}:` \n\n${direction.mentors[user.userId]}"
-        } ?: "В тебе немає напрямів. Швидше додавай нові!"
     }
 
     companion object {

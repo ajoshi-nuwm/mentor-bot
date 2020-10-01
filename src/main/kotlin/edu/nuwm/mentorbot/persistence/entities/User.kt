@@ -9,7 +9,8 @@ data class User(
         val username: String,
         val chatId: Long,
         var state: State,
-        val context: MutableMap<String, String> = mutableMapOf()
+        val context: MutableMap<String, String> = mutableMapOf(),
+        val directions: MutableSet<String> = mutableSetOf()
 )
 
 enum class State {
