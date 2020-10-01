@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document(collection = "directions")
 data class Direction(
         @Id val name: String,
-        val active: Boolean = false,
+        // TODO: set to false
+        val active: Boolean = true,
         val mentors: MutableMap<Int, String> = mutableMapOf()
 )

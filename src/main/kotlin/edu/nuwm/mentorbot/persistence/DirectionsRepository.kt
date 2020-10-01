@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface DirectionsRepository : CrudRepository<Direction, String> {
-    fun findByActiveTrue(): Collection<Direction>
+    fun findByActiveTrueOrderByName(): Collection<Direction>
 }

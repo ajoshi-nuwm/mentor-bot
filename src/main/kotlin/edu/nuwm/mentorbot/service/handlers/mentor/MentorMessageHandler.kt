@@ -9,7 +9,6 @@ import edu.nuwm.mentorbot.service.controls.keyboards.ButtonConstants.Companion.M
 import edu.nuwm.mentorbot.service.controls.keyboards.ButtonConstants.Companion.MENTOR_GET_OTHER_MENTORS
 import edu.nuwm.mentorbot.service.handlers.MessageHandler.Companion.ERROR_GREETING
 import org.springframework.stereotype.Component
-import org.telegram.telegrambots.meta.api.methods.ParseMode
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 
 @Component
@@ -23,12 +22,10 @@ class MentorMessageHandler(
             MENTOR_ADD_DIRECTION -> {
                 user.state = State.MENTOR_ADD_DIRECTION
                 usersRepository.save(user)
-                SendMessage(user.chatId, ADDING_DIRECTION + "\n\n" + getDirections()).setParseMode(ParseMode.MARKDOWN)
+                SendMessage(user.chatId, ADDING_DIRECTION + "\n\n" + getDirections())
             }
             MENTOR_GET_MY_DIRECTIONS -> {
-                user.state = State.MENTOR_DEFAULT
-                usersRepository.save(user)
-                SendMessage(user.chatId, GETTING_MY_DIRECTIONS)
+                SendMessage(user.chatId, getMentorDirections(user))
             }
             MENTOR_GET_OTHER_MENTORS -> {
                 user.state = State.MENTOR_DEFAULT
@@ -39,13 +36,24 @@ class MentorMessageHandler(
         }
     }
 
-    fun getDirections(): String {
-        return directionsRepository.findByActiveTrue().joinToString("\n") { "`${it.name}`" }
+    private fun getDirections(): String {
+        return directionsRepository.findByActiveTrueOrderByName().withIndex()
+                .joinToString("\n") { indexedValue -> "`${indexedValue.index + 1}. ${indexedValue.value.name}`" }
+    }
+
+    private fun getMentorDirections(user: User): String {
+        val userDirections = user.context["directions"]
+        val directionIds = userDirections?.split(":")
+        val found = directionIds?.let {
+            directionsRepository.findAllById(it)
+        }
+        return found?.joinToString("\n\n") { direction ->
+            "`${direction.name}:` \n\n${direction.mentors[user.userId]}"
+        } ?: "В тебе немає напрямів. Швидше додавай нові!"
     }
 
     companion object {
         const val ADDING_DIRECTION = "Обери серед запропонованих напрямів або додай свій:"
-        const val GETTING_MY_DIRECTIONS = "Мої напрями"
         const val GETTING_OTHER_MENTORS = "Шукаємо інших менторів"
     }
 }

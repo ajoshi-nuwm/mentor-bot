@@ -5,9 +5,10 @@ import edu.nuwm.mentorbot.persistence.entities.State
 import edu.nuwm.mentorbot.persistence.entities.User
 import edu.nuwm.mentorbot.service.controls.KeyboardProvider
 import edu.nuwm.mentorbot.service.handlers.common.InitMessageHandler
-import edu.nuwm.mentorbot.service.handlers.mentor.MentorAddDirectionHandler
-import edu.nuwm.mentorbot.service.handlers.mentor.MentorMessageHandler
 import edu.nuwm.mentorbot.service.handlers.common.SetTypeMessageHandler
+import edu.nuwm.mentorbot.service.handlers.mentor.MentorAddDirectionHandler
+import edu.nuwm.mentorbot.service.handlers.mentor.MentorAddExperienceHandler
+import edu.nuwm.mentorbot.service.handlers.mentor.MentorMessageHandler
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
@@ -20,6 +21,7 @@ class BotService(
         private val setTypeHandler: SetTypeMessageHandler,
         private val mentorMessageHandler: MentorMessageHandler,
         private val mentorAddDirectionHandler: MentorAddDirectionHandler,
+        private val mentorAddExperienceHandler: MentorAddExperienceHandler,
         private val keyboardProvider: KeyboardProvider
 ) {
 
@@ -43,6 +45,9 @@ class BotService(
             State.MENTOR_DEFAULT -> mentorMessageHandler.getMessage(user, inputMessage)
             // add direction
             State.MENTOR_ADD_DIRECTION -> mentorAddDirectionHandler.getMessage(user, inputMessage)
+            // add experience
+            State.MENTOR_ADD_EXPERIENCE -> mentorAddExperienceHandler.getMessage(user, inputMessage)
+
             else -> SendMessage(chatId, "Спробуй ще раз")
         }
 

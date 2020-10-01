@@ -8,7 +8,8 @@ data class User(
         @Id val userId: Int,
         val username: String,
         val chatId: Long,
-        var state: State
+        var state: State,
+        val context: MutableMap<String, String> = mutableMapOf()
 )
 
 enum class State {
@@ -19,7 +20,7 @@ enum class State {
     // mentor states
     MENTOR_DEFAULT,
     MENTOR_ADD_DIRECTION,
-    MENTOR_ADD_DIRECTION_INFORMATION,
+    MENTOR_ADD_EXPERIENCE,
 
     // student states
     STUDENT_DEFAULT
